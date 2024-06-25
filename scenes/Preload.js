@@ -5,19 +5,19 @@ export default class Preload extends Phaser.Scene {
 
   preload() {
     // Cargar imágenes y spritesheets necesarios para el juego
-    this.load.image("sky", "./public/assets/images/fondopanda.png");
-    this.load.image("platform", "./public/assets/images/platform.png");
-    this.load.image("powerup", "./public/assets/images/power up.png");
-    this.load.image("enemy", "./public/assets/images/duendesss.png");
-    this.load.spritesheet("player", "./public/assets/images/Panda animado0000.png", {
+    this.load.image("sky", "./public/fondopanda.png");
+    this.load.image("platform", "./public/platform.png");
+    this.load.image("powerup", "./public/power up.png");
+    this.load.image("enemy", "./public/duendesss.png");
+    this.load.spritesheet("player", "./public/Panda animado0000.png", {
       frameWidth: 184,
       frameHeight: 325
     });
-    this.load.spritesheet('player_jump', './public/assets/images/spritesheet pandaL.png', {
+    this.load.spritesheet('player_jump', './public/spritesheet pandaL.png', {
       frameWidth: 75,
       frameHeight: 81
     });
-    this.load.spritesheet('player_jump_right', './public/assets/images/spritesheet pandaR.png', {
+    this.load.spritesheet('player_jump_right', './public/spritesheet pandaR.png', {
       frameWidth: 75,
       frameHeight: 81
     });
