@@ -7,5 +7,5 @@ export const gameOptions = {
     platformHorizontalDistanceRange: [0, 250], // rango de distancia horizontal de la plataforma desde el centro del escenario, en pixeles
     platformFixedLength: 150, // Nueva opción para establecer un tamaño fijo para las plataformas
     jumpForce: 800, // Fuerza del salto
-    platformVerticalDistanceRange: [150, 300] // rango de distancia vertical de la plataforma desde la plataforma anterior, en pixeles 
+    platformVerticalDistanceRange: [0, 300] // rango de distancia vertical de la plataforma desde la plataforma anterior, en pixeles 
 }
