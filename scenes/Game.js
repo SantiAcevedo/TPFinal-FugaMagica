@@ -196,7 +196,7 @@ export default class Game extends Phaser.Scene {
   
     this.parallaxLayers = [
       {
-        speed: 0.6,
+        speed: 0.2,
         sprite: this.sky,
       },
     ];
