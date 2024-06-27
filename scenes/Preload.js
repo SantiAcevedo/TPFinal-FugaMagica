@@ -5,7 +5,7 @@ export default class Preload extends Phaser.Scene {
 
   preload() {
     // Cargar imágenes y spritesheets necesarios para el juego
-    this.load.image("sky", "./public/assets/images/fondopanda.png");
+    this.load.image("sky", "./public/assets/images/fondopandaa.png");
     this.load.image("platform", "./public/assets/images/platform.png");
     this.load.image("powerup", "./public/assets/images/power up.png");
     this.load.image("enemy", "./public/assets/images/duendesss.png");

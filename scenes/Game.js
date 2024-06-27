@@ -6,16 +6,17 @@ export default class Game extends Phaser.Scene {
   }
 
   init() {
-     this.lastDirection = 'right'; // Nueva propiedad para rastrear la última dirección
+    this.lastDirection = 'right';
     this.firstMove = true;
     this.platformTouched = false;
-    this.maxHeight = 0; // Variable para almacenar la altura máxima alcanzada
+    this.maxHeight = 0;
   }
 
   create() {
     this.addBackground();
     this.platformGroup = this.physics.add.group();
-    this.powerUpGroup = this.physics.add.group(); // Grupo de power-ups
+    this.powerUpGroup = this.physics.add.group();
+    this.disappearingPlatformGroup = this.physics.add.group(); // Nuevo grupo de plataformas que desaparecen
 
     const positionX = this.game.config.width / 2;
     const positionY = this.game.config.height * gameOptions.firstPlatformPosition;
@@ -24,43 +25,49 @@ export default class Game extends Phaser.Scene {
     this.platform.setScale(0.3, 1);
     this.platform.setImmovable(true);
 
-    // Crear las plataformas iniciales dentro de la pantalla
+    this.invisiblePlatform = this.physics.add.sprite(positionX, -50, "platform");
+    this.invisiblePlatform.setScale(2, 1);
+    this.invisiblePlatform.setImmovable(true);
+    this.invisiblePlatform.setVisible(false);
+
     for (let i = 0; i < 15; i++) {
       let platform = this.platformGroup.create(0, 0, "platform");
       platform.setImmovable(true);
       this.positionInitialPlatform(platform, i);
 
-      // Posicionar un power-up aleatoriamente sobre algunas plataformas
-      if (Phaser.Math.Between(0, 9) === 0) { // 10% de probabilidad de que aparezca un power-up
+      if (Phaser.Math.Between(0, 9) === 0) {
         let powerUp = this.powerUpGroup.create(0, 0, "powerup");
         powerUp.setScale(1.5);
         powerUp.setImmovable(true);
-        powerUp.y = platform.y - platform.displayHeight / 2 - 20; // Posicionar el power-up sobre la plataforma
+        powerUp.y = platform.y - platform.displayHeight / 2 - 20;
         powerUp.x = platform.x;
       }
     }
 
-    // Crear plataforma estática en la parte inferior de la pantalla
+    // // Crear plataformas que desaparecen
+    // for (let i = 0; i < 5; i++) {
+    //   let disappearingPlatform = this.disappearingPlatformGroup.create(0, 0, "platform");
+    //   disappearingPlatform.setImmovable(true);
+    //   this.positionInitialPlatform(disappearingPlatform, i);
+    //   disappearingPlatform.setTint(0xff0000); // Color distintivo para las plataformas que desaparecen
+    // }
+
     this.staticPlatform = this.physics.add.sprite(positionX, this.game.config.height - 140, "platform");
     this.staticPlatform.setScale(0.4, 0.8);
     this.staticPlatform.setImmovable(true);
 
-    //plataforma estatica
-    this.physics.add.collider(this.staticPlatform, this.player)
+    this.physics.add.collider(this.staticPlatform, this.player);
 
-    // Crear el jugador en la parte inferior de la pantalla, sobre la plataforma estática
     this.player = this.physics.add.sprite(positionX, this.game.config.height - 320, "player");
     this.player.setScale(1.5);
     this.player.setGravityY(gameOptions.gameGravity);
 
-    // Crear enemigo
-    //this.enemy = this.physics.add.sprite(positionX, this.game.config.height - 100, "enemy");
-    //this.enemy.setScale(2);
-
-    // Colisionador entre jugador y plataformas usando playerCanThrow
     this.physics.add.collider(this.platformGroup, this.player, null, this.playerCanThrow, this);
+    this.physics.add.collider(this.invisiblePlatform, this.player);
 
-    // Definir la animación de salto del jugador
+    // Colisionador para plataformas que desaparecen
+    this.physics.add.collider(this.disappearingPlatformGroup, this.player, this.handleDisappearingPlatform, null, this);
+
     this.anims.create({
       key: 'jumpLeft',
       frames: this.anims.generateFrameNumbers('player', { start: 3, end: 5 }),
@@ -75,7 +82,6 @@ export default class Game extends Phaser.Scene {
       repeat: 0
     });
 
-    // Configurar evento para la barra espaciadora
     this.input.keyboard.on('keydown-SPACE', function () {
       if (this.firstMove) {
         this.firstMove = false;
@@ -90,10 +96,8 @@ export default class Game extends Phaser.Scene {
     this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-    // Colisionadores
-    this.physics.add.overlap(this.player, this.powerUpGroup, this.collectPowerUp, null, this); // Colisionador para recoger power-ups
+    this.physics.add.overlap(this.player, this.powerUpGroup, this.collectPowerUp, null, this);
 
-    // Textos
     this.textTimer = this.add.text(10, 10, "0", {
       fontSize: "32px",
       fill: "#fff",
@@ -104,11 +108,6 @@ export default class Game extends Phaser.Scene {
       fill: "#fff",
     }).setOrigin(1, 0);
 
-    // this.textScore = this.add.text(this.game.config.width - 10, 50, "Score: 0", {
-    //   fontSize: "32px",
-    //   fill: "#fff",
-    // }).setOrigin(1, 0);
-
     this.textFirstMove = this.add.text(positionX, 500, "Presiona ESPACIO para JUGAR!", {
       fontSize: "32px",
       fill: "#fff",
@@ -116,16 +115,18 @@ export default class Game extends Phaser.Scene {
   }
 
   update() {
-    if (this.spacebar.isDown && this.player.body.touching.down){
+
+    this.moveParallax(); // Asegúrate de llamar esta función en tu ciclo de actualización
+    
+    if (this.spacebar.isDown && this.player.body.touching.down) {
       this.player.setVelocityY(-gameOptions.jumpForce);
     }
 
-    if(!this.player.body.touching.down){
-      if (this.keyA.isDown){ 
+    if (!this.player.body.touching.down) {
+      if (this.keyA.isDown) {
         console.log("prueba")
         this.player.anims.play("jumpLeft")
-      }
-      else if (this.keyD.isDown){ 
+      } else if (this.keyD.isDown) {
         this.player.anims.play("jumpRight")
       }
     }
@@ -137,7 +138,6 @@ export default class Game extends Phaser.Scene {
       if (platform.getBounds().top > this.game.config.height) {
         this.positionPlatform(platform);
 
-        // Reposicionar el power-up si está fuera de la pantalla
         let powerUp = this.powerUpGroup.getFirstDead();
         if (powerUp) {
           powerUp.setActive(true).setVisible(true);
@@ -163,12 +163,11 @@ export default class Game extends Phaser.Scene {
       this.player.setVelocityX(0);
     }
 
-    // Calcular la distancia recorrida basada en la altura máxima alcanzada
     if (!this.firstMove) {
       const currentHeight = this.game.config.height - this.player.y;
       if (currentHeight > this.maxHeight) {
         this.maxHeight = currentHeight;
-        this.textDistance.setText((this.maxHeight / 10).toFixed(0) + " m"); // 10 píxeles = 1 metro (ajusta según tu escala)
+        this.textDistance.setText((this.maxHeight / 10).toFixed(0) + " m");
       }
     }
   }
@@ -181,12 +180,36 @@ export default class Game extends Phaser.Scene {
     }
   }
 
-  addBackground() {
-    this.centerX = this.game.config.width / 2;
-    this.centerY = this.game.config.height / 2; 
-    this.background = this.add.image(this.centerX, this.centerY, "sky").setScale(2.9);
+  handleDisappearingPlatform(player, platform) {
+    platform.disableBody(true, true); // Desactivar la plataforma cuando el jugador la toque
   }
 
+  addBackground() {
+    // Centra el fondo estático
+    this.centerX = this.game.config.width / 2;
+    this.centerY = this.game.config.height / 2;
+  
+    // Configura el tileSprite para el efecto de parallax
+    this.sky = this.add.tileSprite(this.centerX, this.centerY, this.game.config.width, this.game.config.height, "sky");
+    this.sky.setScale(2.9);
+    this.sky.setOrigin(0.4 , 0.4); // Asegura que el origen del tileSprite esté centrado
+  
+    this.parallaxLayers = [
+      {
+        speed: 0.6,
+        sprite: this.sky,
+      },
+    ];
+  }
+  
+  
+
+  moveParallax() {
+    this.parallaxLayers.forEach((layer) => {
+      layer.sprite.tilePositionY -= layer.speed;
+    });
+  }
+  
   movePlayer(e) {
     const isClickedRight = e.x > this.game.config.width / 2;
     const speedX = gameOptions.heroSpeed * (isClickedRight ? 1 : -1);
@@ -211,7 +234,7 @@ export default class Game extends Phaser.Scene {
   getHighestPlatform() {
     let highestPlatform = this.game.config.height;
     const hijos = this.platformGroup.getChildren();
-    
+
     hijos.forEach(function (platform) {
       highestPlatform = Math.min(highestPlatform, platform.y);
     });
@@ -219,8 +242,8 @@ export default class Game extends Phaser.Scene {
   }
 
   positionPlatform(platform) {
-    const marginVertical = 50; // margen mínimo vertical entre plataformas
-    const marginHorizontal = 50; // margen mínimo horizontal entre plataformas
+    const marginVertical = 50;
+    const marginHorizontal = 50;
 
     platform.y = this.getHighestPlatform() - marginVertical - this.randomValue(gameOptions.platformVerticalDistanceRange);
     platform.x = Phaser.Math.Clamp(
@@ -232,8 +255,8 @@ export default class Game extends Phaser.Scene {
   }
 
   positionInitialPlatform(platform, index) {
-    const marginVertical = 50; // margen mínimo vertical entre plataformas
-    const marginHorizontal = 50; // margen mínimo horizontal entre plataformas
+    const marginVertical = 50;
+    const marginHorizontal = 50;
 
     platform.y = this.game.config.height - marginVertical - (index * this.randomValue(gameOptions.platformVerticalDistanceRange));
     platform.x = Phaser.Math.Clamp(
@@ -241,6 +264,7 @@ export default class Game extends Phaser.Scene {
       marginHorizontal,
       this.game.config.width - marginHorizontal
     );
+
     platform.displayWidth = gameOptions.platformFixedLength;
   }
 
