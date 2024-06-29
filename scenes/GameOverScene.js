@@ -8,13 +8,13 @@ export default class GameOverScene extends Phaser.Scene {
     const { width, height } = this.game.config;
     
     // Añadir texto de Game Over
-    this.add.text(width / 2, height / 2 - 50, "GAME OVER", {
+    this.add.text(width / 2, height / 2 - 50, "TE ATRAPARON!", {
       fontSize: "64px",
       fill: "#fff"
     }).setOrigin(0.5);
     
     // Añadir opción para reiniciar el juego
-    this.add.text(width / 2, height / 2 + 50, "Press SPACE to Restart", {
+    this.add.text(width / 2, height / 2 + 50, "Apreta ESPACIO para reiniciar", {
       fontSize: "32px",
       fill: "#fff"
     }).setOrigin(0.5);

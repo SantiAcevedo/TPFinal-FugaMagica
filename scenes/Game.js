@@ -15,6 +15,7 @@ export default class Game extends Phaser.Scene {
 
   create() {
     this.addBackground();
+    this.addBackgroundMusic();
     this.platformGroup = this.physics.add.group();
     this.powerUpGroup = this.physics.add.group();
     //this.disappearingPlatformGroup = this.physics.add.group(); // Nuevo grupo de plataformas que desaparecen
@@ -155,6 +156,7 @@ export default class Game extends Phaser.Scene {
     }
 
     if (this.player.y > this.game.config.height) {
+      this.backgroundMusic.stop(); // Detener la música de fondo
       this.scene.start("GameOverScene");
     }
 
@@ -217,6 +219,11 @@ export default class Game extends Phaser.Scene {
       this.textFirstMove.setText("");
       this.platformGroup.setVelocityY(gameOptions.platformSpeed);
     }
+  }
+
+  addBackgroundMusic() {
+    this.backgroundMusic = this.sound.add('mainsong', { loop: true, volume: 0.5 });
+    this.backgroundMusic.play();
   }
 
   stopPlayer() {

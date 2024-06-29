@@ -9,6 +9,7 @@ export default class Preload extends Phaser.Scene {
     this.load.image("platform", "./public/assets/images/platform.png");
     this.load.image("powerup", "./public/assets/images/power up.png");
     this.load.image("enemy", "./public/assets/images/duendesss.png");
+    this.load.audio("mainsong", "./public/assets/sounds/music.mp3");
     this.load.spritesheet("player", "./public/assets/images/spritesheetpandaa.png", {
       frameWidth: 75,
       frameHeight: 87
