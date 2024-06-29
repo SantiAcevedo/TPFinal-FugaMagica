@@ -163,8 +163,8 @@ export default class Game extends Phaser.Scene {
 
     if (this.player.y > this.game.config.height) {
       this.backgroundMusic.stop(); // Detener la música de fondo
-      this.scene.start("GameOverScene");
-    }
+      this.scene.start("GameOverScene", { score: this.score, time: this.textTimer.text });
+      }
 
     if (this.keyA.isDown) {
       this.player.setVelocityX(-gameOptions.heroSpeed);
