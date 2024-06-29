@@ -10,16 +10,17 @@ export default class Game extends Phaser.Scene {
     this.firstMove = true;
     this.platformTouched = false;
     this.maxHeight = 0;
+    this.gameOver = false;
   }
 
   create() {
     this.addBackground();
     this.platformGroup = this.physics.add.group();
     this.powerUpGroup = this.physics.add.group();
-    this.disappearingPlatformGroup = this.physics.add.group(); // Nuevo grupo de plataformas que desaparecen
+    //this.disappearingPlatformGroup = this.physics.add.group(); // Nuevo grupo de plataformas que desaparecen
 
     const positionX = this.game.config.width / 2;
-    const positionY = this.game.config.height * gameOptions.firstPlatformPosition;
+    const positionY = this.game.config.height ;
 
     this.platform = this.platformGroup.create(positionX, positionY, "platform");
     this.platform.setScale(0.3, 1);
@@ -30,7 +31,7 @@ export default class Game extends Phaser.Scene {
     this.invisiblePlatform.setImmovable(true);
     this.invisiblePlatform.setVisible(false);
 
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 10; i++) {
       let platform = this.platformGroup.create(0, 0, "platform");
       platform.setImmovable(true);
       this.positionInitialPlatform(platform, i);
@@ -52,9 +53,11 @@ export default class Game extends Phaser.Scene {
     //   disappearingPlatform.setTint(0xff0000); // Color distintivo para las plataformas que desaparecen
     // }
 
-    this.staticPlatform = this.physics.add.sprite(positionX, this.game.config.height - 140, "platform");
+    this.staticPlatform = this.physics.add.sprite(positionX, 1200, "platform");
     this.staticPlatform.setScale(0.4, 0.8);
     this.staticPlatform.setImmovable(true);
+
+    //colision plataforma inicial y jugador
 
     this.physics.add.collider(this.staticPlatform, this.player);
 
@@ -66,7 +69,7 @@ export default class Game extends Phaser.Scene {
     this.physics.add.collider(this.invisiblePlatform, this.player);
 
     // Colisionador para plataformas que desaparecen
-    this.physics.add.collider(this.disappearingPlatformGroup, this.player, this.handleDisappearingPlatform, null, this);
+    //this.physics.add.collider(this.disappearingPlatformGroup, this.player, this.handleDisappearingPlatform, null, this);
 
     this.anims.create({
       key: 'jumpLeft',
@@ -152,7 +155,7 @@ export default class Game extends Phaser.Scene {
     }
 
     if (this.player.y > this.game.config.height) {
-      this.scene.start("game");
+      this.scene.start("GameOverScene");
     }
 
     if (this.keyA.isDown) {
@@ -163,13 +166,6 @@ export default class Game extends Phaser.Scene {
       this.player.setVelocityX(0);
     }
 
-    if (!this.firstMove) {
-      const currentHeight = this.game.config.height - this.player.y;
-      if (currentHeight > this.maxHeight) {
-        this.maxHeight = currentHeight;
-        this.textDistance.setText((this.maxHeight / 10).toFixed(0) + " m");
-      }
-    }
   }
 
   playerCanThrow(player, platform) {
@@ -242,8 +238,8 @@ export default class Game extends Phaser.Scene {
   }
 
   positionPlatform(platform) {
-    const marginVertical = 50;
-    const marginHorizontal = 50;
+    const marginVertical = 80;
+    const marginHorizontal = 80;
 
     platform.y = this.getHighestPlatform() - marginVertical - this.randomValue(gameOptions.platformVerticalDistanceRange);
     platform.x = Phaser.Math.Clamp(
@@ -255,8 +251,8 @@ export default class Game extends Phaser.Scene {
   }
 
   positionInitialPlatform(platform, index) {
-    const marginVertical = 50;
-    const marginHorizontal = 50;
+    const marginVertical = 80;
+    const marginHorizontal = 80;
 
     platform.y = this.game.config.height - marginVertical - (index * this.randomValue(gameOptions.platformVerticalDistanceRange));
     platform.x = Phaser.Math.Clamp(

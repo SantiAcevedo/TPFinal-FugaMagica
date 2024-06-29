@@ -1,5 +1,5 @@
 export const gameOptions = {
-    firstPlatformPosition: 0 / 10, // primer posicion vertical de la plataforma. 0 = parte superior de la pantalla, 1 = parte inferior de la pantalla
+    //firstPlatformPosition: 0 / 10, // primer posicion vertical de la plataforma. 0 = parte superior de la pantalla, 1 = parte inferior de la pantalla
     gameGravity: 1200, // gravedad del juego, que solo afecta al player
     heroSpeed: 300, // velocidad del jugador, en pixeles por segundo
     platformSpeed: 250, // velocidad de las plataformas, en pixeles por segundo
