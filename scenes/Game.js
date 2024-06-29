@@ -11,6 +11,7 @@ export default class Game extends Phaser.Scene {
     this.platformTouched = false;
     this.maxHeight = 0;
     this.gameOver = false;
+    this.score = 0; // Inicializar el puntaje
   }
 
   create() {
@@ -21,7 +22,7 @@ export default class Game extends Phaser.Scene {
     //this.disappearingPlatformGroup = this.physics.add.group(); // Nuevo grupo de plataformas que desaparecen
 
     const positionX = this.game.config.width / 2;
-    const positionY = this.game.config.height ;
+    const positionY = this.game.config.height;
 
     this.platform = this.platformGroup.create(positionX, positionY, "platform");
     this.platform.setScale(0.3, 1);
@@ -107,10 +108,10 @@ export default class Game extends Phaser.Scene {
       fill: "#fff",
     });
 
-    this.textDistance = this.add.text(this.game.config.width - 10, 10, "0 m", {
+    this.textScore = this.add.text(this.game.config.width / 2, 10, "Metros: 0", {
       fontSize: "32px",
       fill: "#fff",
-    }).setOrigin(1, 0);
+    }).setOrigin(-0.8, 0);
 
     this.textFirstMove = this.add.text(positionX, 500, "Presiona ESPACIO para JUGAR!", {
       fontSize: "32px",
@@ -148,6 +149,11 @@ export default class Game extends Phaser.Scene {
           powerUp.y = platform.y - platform.displayHeight / 2 - 20;
           powerUp.x = platform.x;
         }
+      }
+
+      if (platform.y > this.player.y && !platform.passed) {
+        platform.passed = true;
+        this.increaseScore();
       }
     }, this);
 
@@ -255,6 +261,7 @@ export default class Game extends Phaser.Scene {
       this.game.config.width - marginHorizontal
     );
     platform.displayWidth = gameOptions.platformFixedLength;
+    platform.passed = false; // Reiniciar la marca de plataforma pasada
   }
 
   positionInitialPlatform(platform, index) {
@@ -269,6 +276,7 @@ export default class Game extends Phaser.Scene {
     );
 
     platform.displayWidth = gameOptions.platformFixedLength;
+    platform.passed = false; // Inicializar la marca de plataforma pasada
   }
 
   addTimer() {
@@ -280,7 +288,7 @@ export default class Game extends Phaser.Scene {
     });
   }
 
-  updateTimer(){
+  updateTimer() {
     this.textTimer.setText(parseInt(this.textTimer.text) + 1);
   }
 
@@ -298,7 +306,13 @@ export default class Game extends Phaser.Scene {
     // Aplicar impulso hacia arriba
     this.player.setVelocityY(-gameOptions.jumpForce * 1.5); // Ajusta el valor según la fuerza del impulso deseada
   }
+
+  increaseScore() {
+    this.score += 10; // Ajusta el valor según la cantidad de puntos deseada
+    this.textScore.setText("Metros: " + this.score);
+  }
 }
+
 
 
 
