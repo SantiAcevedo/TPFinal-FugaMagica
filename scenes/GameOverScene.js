@@ -22,8 +22,8 @@ export default class GameOverScene extends Phaser.Scene {
       fill: "#fff"
     }).setOrigin(0.5);
 
-    // Mostrar puntuación final
-    this.add.text(width / 2, height / 2 - 30, `¡Subiste esta cantidad de metros!: ${data.score}`, {
+    // Mostrar puntuación final con "metros" entre comillas
+    this.add.text(width / 2, height / 2 - 30, `¡Subiste ${data.score} metros!`, {
       fontSize: "32px",
       fill: "#fff",
     }).setOrigin(0.5);

@@ -19,11 +19,12 @@ export default class Game extends Phaser.Scene {
     this.addBackgroundMusic();
     this.platformGroup = this.physics.add.group();
     this.powerUpGroup = this.physics.add.group();
-    //this.disappearingPlatformGroup = this.physics.add.group(); // Nuevo grupo de plataformas que desaparecen
+    this.enemyGroup = this.physics.add.group(); // Crear grupo de enemigos
 
     const positionX = this.game.config.width / 2;
-    const positionY = this.game.config.height;
+    const positionY = this.game.config.height - 300; // Ajusta esta posición para que la plataforma inicial esté visible
 
+    // Crear la plataforma inicial y ajustar su posición
     this.platform = this.platformGroup.create(positionX, positionY, "platform");
     this.platform.setScale(0.3, 1);
     this.platform.setImmovable(true);
@@ -47,31 +48,20 @@ export default class Game extends Phaser.Scene {
       }
     }
 
-    // // Crear plataformas que desaparecen
-    // for (let i = 0; i < 5; i++) {
-    //   let disappearingPlatform = this.disappearingPlatformGroup.create(0, 0, "platform");
-    //   disappearingPlatform.setImmovable(true);
-    //   this.positionInitialPlatform(disappearingPlatform, i);
-    //   disappearingPlatform.setTint(0xff0000); // Color distintivo para las plataformas que desaparecen
-    // }
-
     this.staticPlatform = this.physics.add.sprite(positionX, 1200, "platform");
     this.staticPlatform.setScale(0.4, 0.8);
     this.staticPlatform.setImmovable(true);
 
     //colision plataforma inicial y jugador
-
     this.physics.add.collider(this.staticPlatform, this.player);
 
-    this.player = this.physics.add.sprite(positionX, this.game.config.height - 320, "player");
+    // Posicionar al jugador encima de la plataforma inicial
+    this.player = this.physics.add.sprite(positionX, positionY - 350, "player"); // Ajusta esta posición según sea necesario
     this.player.setScale(1.5);
     this.player.setGravityY(gameOptions.gameGravity);
 
     this.physics.add.collider(this.platformGroup, this.player, null, this.playerCanThrow, this);
     this.physics.add.collider(this.invisiblePlatform, this.player);
-
-    // Colisionador para plataformas que desaparecen
-    //this.physics.add.collider(this.disappearingPlatformGroup, this.player, this.handleDisappearingPlatform, null, this);
 
     this.anims.create({
       key: 'jumpLeft',
@@ -117,10 +107,22 @@ export default class Game extends Phaser.Scene {
       fontSize: "32px",
       fill: "#fff",
     }).setOrigin(0.5, 0);
+
+    // Crear el enemigo en la parte inferior de la pantalla
+    this.enemy = this.enemyGroup.create(this.game.config.width / 2, this.game.config.height - 50, 'enemy');
+    this.enemy.setScale(2.1); // Ajusta el valor según la escala deseada
+    this.enemy.setImmovable(true);
+    
+
+    // Colisionador entre el jugador y el enemigo
+    this.physics.add.collider(this.player, this.enemy, () => {
+      this.sound.play('goblins');
+      this.playerDies(this.player, this.enemy);
+      }, null, this);
+  
   }
 
   update() {
-
     this.moveParallax(); // Asegúrate de llamar esta función en tu ciclo de actualización
     
     if (this.spacebar.isDown && this.player.body.touching.down) {
@@ -129,7 +131,6 @@ export default class Game extends Phaser.Scene {
 
     if (!this.player.body.touching.down) {
       if (this.keyA.isDown) {
-        console.log("prueba")
         this.player.anims.play("jumpLeft")
       } else if (this.keyD.isDown) {
         this.player.anims.play("jumpRight")
@@ -206,8 +207,6 @@ export default class Game extends Phaser.Scene {
     ];
   }
   
-  
-
   moveParallax() {
     this.parallaxLayers.forEach((layer) => {
       layer.sprite.tilePositionY -= layer.speed;
@@ -311,7 +310,17 @@ export default class Game extends Phaser.Scene {
     this.score += 10; // Ajusta el valor según la cantidad de puntos deseada
     this.textScore.setText("Metros: " + this.score);
   }
+
+  playerDies(player, enemy) {
+    // Lógica para cuando el jugador muere
+    this.backgroundMusic.stop(); // Detener la música de fondo si es necesario
+    this.player.setTint(0xff0000); // Cambiar el color del jugador o cualquier efecto visual de muerte
+    this.player.setVelocity(0); // Detener cualquier movimiento del jugador
+    this.scene.start("GameOverScene", { score: this.score, time: this.textTimer.text }); // Iniciar la escena de Game Over
+  }
 }
+
+
 
 
 
