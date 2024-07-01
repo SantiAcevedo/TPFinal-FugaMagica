@@ -51,7 +51,7 @@ export default class Game extends Phaser.Scene {
     this.staticPlatform.setScale(0.4, 0.8);
     this.staticPlatform.setImmovable(true);
 
-    //colision plataforma inicial y jugador
+    // Colision plataforma inicial y jugador
     this.physics.add.collider(this.staticPlatform, this.player);
 
     // Posicionar al jugador encima de la plataforma inicial
@@ -114,13 +114,17 @@ export default class Game extends Phaser.Scene {
     this.enemy.setScale(2.1); // Ajusta el valor según la escala deseada
     this.enemy.setImmovable(true);
     
+    // Crear la plataforma invisible debajo del enemigo
+    this.enemyPlatform = this.physics.add.sprite(this.game.config.width / 2, this.enemy.y + 50, "platform");
+    this.enemyPlatform.setScale(2, 1);
+    this.enemyPlatform.setImmovable(true);
+    this.enemyPlatform.setVisible(false);
 
     // Colisionador entre el jugador y el enemigo
-    this.physics.add.collider(this.player, this.enemy, () => {
+    this.physics.add.collider(this.player, this.enemyPlatform, () => {
       this.sound.play('goblins');
-      this.playerDies(this.player, this.enemy);
-      }, null, this);
-  
+      this.playerDies(this.player, this.enemyPlatform);
+    }, null, this);
   }
 
   update() {
@@ -166,7 +170,7 @@ export default class Game extends Phaser.Scene {
     if (this.player.y > this.game.config.height) {
       this.backgroundMusic.stop(); // Detener la música de fondo
       this.scene.start("GameOverScene", { score: this.score, time: this.textTimer.text });
-      }
+    }
 
     if (this.keyA.isDown) {
       this.player.setVelocityX(-gameOptions.heroSpeed);
@@ -175,7 +179,6 @@ export default class Game extends Phaser.Scene {
     } else {
       this.player.setVelocityX(0);
     }
-
   }
 
   playerCanThrow(player, platform) {
@@ -323,6 +326,7 @@ export default class Game extends Phaser.Scene {
     this.scene.start("GameOverScene", { score: this.score, time: this.textTimer.text }); // Iniciar la escena de Game Over
   }
 }
+
 
 
 
