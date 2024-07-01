@@ -40,11 +40,7 @@ export default class Game extends Phaser.Scene {
       this.positionInitialPlatform(platform, i);
 
       if (Phaser.Math.Between(0, 9) === 0) {
-        let powerUp = this.powerUpGroup.create(0, 0, "powerup");
-        powerUp.setScale(1.5);
-        powerUp.setImmovable(true);
-        powerUp.y = platform.y - platform.displayHeight / 2 - 20;
-        powerUp.x = platform.x;
+        this.createPowerUp(platform);
       }
     }
 
@@ -83,6 +79,7 @@ export default class Game extends Phaser.Scene {
         this.addTimer();
         this.textFirstMove.setText("");
         this.platformGroup.setVelocityY(gameOptions.platformSpeed);
+        this.powerUpGroup.setVelocityY(gameOptions.platformSpeed); // Mover power-ups junto con plataformas
       }
     }, this);
 
@@ -261,6 +258,8 @@ export default class Game extends Phaser.Scene {
     );
     platform.displayWidth = gameOptions.platformFixedLength;
     platform.passed = false; // Reiniciar la marca de plataforma pasada
+
+    this.createPowerUp(platform); // Crear power-up junto con la plataforma
   }
 
   positionInitialPlatform(platform, index) {
@@ -278,6 +277,15 @@ export default class Game extends Phaser.Scene {
     platform.passed = false; // Inicializar la marca de plataforma pasada
   }
 
+  createPowerUp(platform) {
+    if (Phaser.Math.Between(0, 9) === 0) { // Ajusta la probabilidad de aparición del power-up
+      let powerUp = this.powerUpGroup.create(platform.x, platform.y - platform.displayHeight / 2 - 20, "powerup");
+      powerUp.setScale(1.5);
+      powerUp.setImmovable(true);
+      powerUp.setVelocityY(gameOptions.platformSpeed); // Asegurar que el power-up se mueva con la plataforma
+    }
+  }
+
   addTimer() {
     this.time.addEvent({
       delay: 1000,
@@ -290,14 +298,6 @@ export default class Game extends Phaser.Scene {
   updateTimer() {
     this.textTimer.setText(parseInt(this.textTimer.text) + 1);
   }
-
-  // handleCollision(player, platform) {
-  //   if (!this.platformTouched) {
-  //     this.platformTouched = true;
-  //     this.score += 1;
-  //     this.textScore.setText("Score: " + this.score);
-  //   }
-  // }
 
   collectPowerUp(player, powerUp) {
     powerUp.disableBody(true, true); // Desactivar y ocultar el power-up
@@ -319,6 +319,7 @@ export default class Game extends Phaser.Scene {
     this.scene.start("GameOverScene", { score: this.score, time: this.textTimer.text }); // Iniciar la escena de Game Over
   }
 }
+
 
 
 
