@@ -4,11 +4,14 @@ export default class GameOverScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image("endscene", "./public/assets/images/finalduendes.png");
     this.load.audio("endsong", "./public/assets/sounds/endsongg.mp3");
   }
 
   create(data) {
     const { width, height } = this.game.config;
+
+    this.addBackground();
 
     // Añadir música de fondo
     this.backgroundMusic = this.sound.add('endsong', { loop: false, volume: 1 });
@@ -49,6 +52,11 @@ export default class GameOverScene extends Phaser.Scene {
     this.backgroundMusic.on('complete', () => {
       this.backgroundMusic.stop();
     });
+  }
+  addBackground() {
+    this.centerX = this.game.config.width / 2;
+    this.centerY = this.game.config.height / 2; 
+    this.background = this.add.image(this.centerX, this.centerY, "endscene").setScale(1);
   }
 }
 
