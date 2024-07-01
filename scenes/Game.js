@@ -17,7 +17,10 @@ export default class Game extends Phaser.Scene {
   create() {
     this.addBackground();
     this.addBackgroundMusic();
-    this.platformGroup = this.physics.add.group();
+    this.platformGroup = this.physics.add.group({
+      immovable: true,
+      allowGravity: false // Asegúrate de que las plataformas no tengan gravedad
+    });
     this.powerUpGroup = this.physics.add.group();
     this.enemyGroup = this.physics.add.group(); // Crear grupo de enemigos
 
@@ -39,7 +42,7 @@ export default class Game extends Phaser.Scene {
       platform.setImmovable(true);
       this.positionInitialPlatform(platform, i);
 
-      if (Phaser.Math.Between(0, 9) === 0) {
+      if (Phaser.Math.Between(0, 3) === 0) {
         this.createPowerUp(platform);
       }
     }
@@ -56,6 +59,7 @@ export default class Game extends Phaser.Scene {
     this.player.setScale(1.5);
     this.player.setGravityY(gameOptions.gameGravity);
 
+    // Agregar colisiones
     this.physics.add.collider(this.platformGroup, this.player, null, this.playerCanThrow, this);
     this.physics.add.collider(this.invisiblePlatform, this.player);
 
@@ -319,6 +323,7 @@ export default class Game extends Phaser.Scene {
     this.scene.start("GameOverScene", { score: this.score, time: this.textTimer.text }); // Iniciar la escena de Game Over
   }
 }
+
 
 
 
