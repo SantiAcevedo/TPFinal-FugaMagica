@@ -278,7 +278,7 @@ export default class Game extends Phaser.Scene {
   }
 
   createPowerUp(platform) {
-    if (Phaser.Math.Between(0, 9) === 0) { // Ajusta la probabilidad de aparición del power-up
+    if (Phaser.Math.Between(0, 3) === 0) { // Ajusta la probabilidad de aparición del power-up
       let powerUp = this.powerUpGroup.create(platform.x, platform.y - platform.displayHeight / 2 - 20, "powerup");
       powerUp.setScale(1.5);
       powerUp.setImmovable(true);
