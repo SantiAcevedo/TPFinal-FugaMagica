@@ -59,8 +59,7 @@ export default class Game extends Phaser.Scene {
     this.staticPlatform.setScale(0.4, 0.8);
     this.staticPlatform.setImmovable(true);
 
-    // Colision plataforma inicial y jugador
-    this.physics.add.collider(this.staticPlatform, this.player);
+  
 
     // Posicionar al jugador encima de la plataforma inicial
     this.player = this.physics.add.sprite(positionX, positionY - 350, "player"); // Ajusta esta posición según sea necesario
@@ -70,6 +69,9 @@ export default class Game extends Phaser.Scene {
     // Agregar colisiones
     this.physics.add.collider(this.platformGroup, this.player, null, this.playerCanThrow, this);
     this.physics.add.collider(this.invisiblePlatform, this.player);
+
+      // Colision plataforma inicial y jugador
+      this.physics.add.collider(this.staticPlatform, this.player);
 
     this.anims.create({
       key: 'jumpLeft',
