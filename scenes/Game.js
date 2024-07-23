@@ -37,10 +37,18 @@ export default class Game extends Phaser.Scene {
     this.invisiblePlatform.setImmovable(true);
     this.invisiblePlatform.setVisible(false);
 
+    const actualPlatform = {
+      x: positionX,
+      y: positionY
+    }
+
     for (let i = 0; i < 10; i++) {
       let platform = this.platformGroup.create(0, 0, "platform");
       platform.setImmovable(true);
-      this.positionInitialPlatform(platform, i);
+      this.positionInitialPlatform(platform, actualPlatform );
+
+      actualPlatform.x = platform.x;
+      actualPlatform.y = platform.y;
 
       if (Phaser.Math.Between(0, 3) === 0) {
         this.createPowerUp(platform);
@@ -269,11 +277,11 @@ export default class Game extends Phaser.Scene {
     this.createPowerUp(platform); // Crear power-up junto con la plataforma
   }
 
-  positionInitialPlatform(platform, index) {
+  positionInitialPlatform(platform, previusPlatform = { x: 0, y: 0}) {
     const marginVertical = 80;
     const marginHorizontal = 80;
 
-    platform.y = this.game.config.height - marginVertical - (index * this.randomValue(gameOptions.platformVerticalDistanceRange));
+    platform.y = previusPlatform.y + this.randomValue(gameOptions.platformVerticalDistanceRange);
     platform.x = Phaser.Math.Clamp(
       this.game.config.width / 2 + this.randomValue(gameOptions.platformHorizontalDistanceRange) * Phaser.Math.RND.sign(),
       marginHorizontal,
